@@ -1,0 +1,383 @@
+@page "/SocialAndCommunity"
+@rendermode InteractiveServer
+@inject AppDbContext Db
+
+<PageTitle>Социална дейност &mdash; Студентски съвет</PageTitle>
+
+<div class="dept-content">
+<div class="page-header">
+    <h1><i class="bi bi-heart-fill me-2"></i>Социална дейност</h1>
+    <p>Доброволчество, анкети и менторски програми</p>
+</div>
+
+<!-- ── Доброволчески инициативи ── -->
+<h2 class="section-heading">Доброволчески инициативи</h2>
+
+@if (showInitForm)
+{
+    <div class="sc-card mb-3">
+        <div class="sc-card-title mb-3">Добави инициатива</div>
+        <div class="row g-2">
+            <div class="col-12 col-md-6">
+                <label class="form-label">Наименование</label>
+                <input class="form-control" @bind="initName" placeholder="Название на инициативата"/>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label">Описание</label>
+                <input class="form-control" @bind="initDescription" placeholder="Кратко описание..."/>
+            </div>
+        </div>
+        <div class="mt-3 d-flex gap-2">
+            <button class="btn btn-primary" @onclick="SaveInitiative">Запази</button>
+            <button class="btn btn-outline-secondary" @onclick="() => showInitForm = false">Откажи</button>
+        </div>
+    </div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="() => showInitForm = true">&#43; Добави инициатива</button>
+}
+
+@if (initiatives.Count == 0)
+{
+    <p class="text-muted fst-italic">Няма добавени инициативи.</p>
+}
+else
+{
+    @foreach (var init in initiatives)
+    {
+        var volunteers = allVolunteers.Where(v => v.InitiativeId == init.Id).ToList();
+        <div class="sc-card mb-3">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                    <div class="sc-card-title">@init.Name</div>
+                    <div class="sc-card-meta">@init.Description</div>
+                    <div class="sc-card-meta"><i class="bi bi-person-check"></i> Записани: @volunteers.Count &nbsp;|&nbsp; <i class="bi bi-hourglass-split"></i> Общо часове: @volunteers.Sum(v => v.Hours)</div>
+                </div>
+                <button class="btn btn-sm btn-danger text-white" @onclick="() => DeleteInitiative(init)">Изтрий</button>
+            </div>
+            <div class="d-flex gap-2 mt-2 flex-wrap">
+                <input class="form-control form-control-sm" style="max-width:180px;"
+                       @bind="newVolName[init.Id]" placeholder="Вашето име"/>
+                <input type="number" class="form-control form-control-sm" style="max-width:90px;"
+                       @bind="newVolHours[init.Id]" min="1" placeholder="Часове"/>
+                <button class="btn btn-sm btn-primary" @onclick="() => AddVolunteer(init.Id)">Запиши се</button>
+            </div>
+            @if (volunteers.Count > 0)
+            {
+                <div class="sc-table table-responsive mt-2">
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>Доброволец</th><th>Часове</th><th></th></tr></thead>
+                        <tbody>
+                            @foreach (var v in volunteers)
+                            {
+                                <tr>
+                                    <td>@v.Name</td>
+                                    <td>@v.Hours</td>
+                                    <td><button class="btn btn-sm btn-danger text-white" @onclick="() => DeleteVolunteer(v)">&#x2715;</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    }
+}
+
+<!-- ── Анкети ── -->
+<h2 class="section-heading">Анкети и гласуване</h2>
+
+@if (showPollForm)
+{
+    <div class="sc-card mb-3">
+        <div class="sc-card-title mb-3">Създай анкета</div>
+        <div class="mb-2">
+            <label class="form-label">Въпрос</label>
+            <input class="form-control" @bind="pollQuestion" placeholder="Вашият въпрос..."/>
+        </div>
+        <label class="form-label">Варианти (минимум 2)</label>
+        @for (int i = 0; i < pollOptions.Count; i++)
+        {
+            var idx = i;
+            <div class="d-flex gap-2 mb-1">
+                <input class="form-control form-control-sm" value="@pollOptions[idx]"
+                       @onchange="e => pollOptions[idx] = e.Value?.ToString() ?? string.Empty"/>
+                @if (pollOptions.Count > 2)
+                {
+                    <button class="btn btn-sm btn-danger text-white" @onclick="() => pollOptions.RemoveAt(idx)">&#x2715;</button>
+                }
+            </div>
+        }
+        <button class="btn btn-sm btn-outline-primary mb-3" @onclick="() => pollOptions.Add(string.Empty)">&#43; Добави вариант</button>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" @onclick="SavePoll">Създай</button>
+            <button class="btn btn-outline-secondary" @onclick="() => showPollForm = false">Откажи</button>
+        </div>
+    </div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenPollForm">&#43; Създай анкета</button>
+}
+
+@if (polls.Count == 0)
+{
+    <p class="text-muted fst-italic">Няма активни анкети.</p>
+}
+else
+{
+    @foreach (var poll in polls)
+    {
+        var options = allPollOptions.Where(o => o.PollId == poll.Id).ToList();
+        var totalVotes = options.Sum(o => o.Votes);
+        <div class="sc-card mb-3">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="sc-card-title">@poll.Question</div>
+                <button class="btn btn-sm btn-danger text-white" @onclick="() => DeletePoll(poll)">Изтрий</button>
+            </div>
+            @foreach (var opt in options)
+            {
+                var pct = totalVotes == 0 ? 0 : (int)(100.0 * opt.Votes / totalVotes);
+                <div class="mb-2 mt-2">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="font-size:0.9rem;">@opt.Text</span>
+                        <span class="badge-amber">@opt.Votes гласа (@pct%)</span>
+                    </div>
+                    <div style="background:#E2C99A; border-radius:6px; height:10px; overflow:hidden;">
+                        <div style="background:var(--amber); height:100%; width:@(pct)%; transition:width 0.3s;"></div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary mt-1" @onclick="() => Vote(opt)">Гласувай</button>
+                </div>
+            }
+        </div>
+    }
+}
+
+<!-- ── Менторска програма ── -->
+<h2 class="section-heading">Менторска програма</h2>
+
+@if (showMentorForm)
+{
+    <div class="sc-card mb-3">
+        <div class="sc-card-title mb-3">Добави участник</div>
+        <div class="row g-2">
+            <div class="col-12 col-md-6">
+                <label class="form-label">Имена</label>
+                <input class="form-control" @bind="mentorName" placeholder="Пълно име"/>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label">Роля</label>
+                <div class="d-flex gap-3 mt-1">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="mrole" value="Ментор"
+                               checked="@(mentorRole == "Ментор")" @onchange="@(() => mentorRole = "Ментор")"/>
+                        <label class="form-check-label">Ментор</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="mrole" value="Менти"
+                               checked="@(mentorRole == "Менти")" @onchange="@(() => mentorRole = "Менти")"/>
+                        <label class="form-check-label">Менти</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3 d-flex gap-2">
+            <button class="btn btn-primary" @onclick="SaveMentor">Запази</button>
+            <button class="btn btn-outline-secondary" @onclick="() => showMentorForm = false">Откажи</button>
+        </div>
+    </div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="() => showMentorForm = true">&#43; Добави участник</button>
+}
+
+@{
+    var mentors = mentorPersons.Where(m => m.Role == "Ментор").ToList();
+    var mentees = mentorPersons.Where(m => m.Role == "Менти").ToList();
+}
+
+@if (mentors.Count == 0 && mentees.Count == 0)
+{
+    <p class="text-muted fst-italic">Няма добавени участници.</p>
+}
+else
+{
+    <div class="row g-3">
+        <div class="col-12 col-md-6">
+            <div class="sc-card-title mb-2">Ментори (@mentors.Count)</div>
+            @foreach (var m in mentors)
+            {
+                <div class="sc-card mb-2 d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-mortarboard-fill"></i> @m.Name</span>
+                    <div class="d-flex gap-2 align-items-center">
+                        <select class="form-select form-select-sm" style="width:auto;"
+                                value="@m.PairedWith"
+                                @onchange="e => UpdatePairing(m, e.Value?.ToString() ?? string.Empty)">
+                            <option value="">— без менти —</option>
+                            @foreach (var mt in mentees)
+                            {
+                                <option value="@mt.Name">@mt.Name</option>
+                            }
+                        </select>
+                        <button class="btn btn-sm btn-danger text-white" @onclick="() => DeleteMentor(m)">&#x2715;</button>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="sc-card-title mb-2">Менти (@mentees.Count)</div>
+            @foreach (var mt in mentees)
+            {
+                <div class="sc-card mb-2 d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-book-fill"></i> @mt.Name</span>
+                    <div class="d-flex gap-2 align-items-center">
+                        @if (!string.IsNullOrEmpty(mt.PairedWith))
+                        {
+                            <span class="badge-amber"><i class="bi bi-link-45deg"></i> @mt.PairedWith</span>
+                        }
+                        <button class="btn btn-sm btn-danger text-white" @onclick="() => DeleteMentor(mt)">&#x2715;</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+</div>
+
+@code {
+    List<Initiative>  initiatives    = new();
+    List<Volunteer>   allVolunteers  = new();
+    List<Poll>        polls          = new();
+    List<PollOption>  allPollOptions = new();
+    List<MentorPerson> mentorPersons = new();
+
+    Dictionary<int, string> newVolName  = new();
+    Dictionary<int, int>    newVolHours = new();
+
+    bool showInitForm;
+    string initName = "", initDescription = "";
+
+    bool showPollForm;
+    string pollQuestion = "";
+    List<string> pollOptions = new() { string.Empty, string.Empty };
+
+    bool showMentorForm;
+    string mentorName = "", mentorRole = "Ментор";
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    void LoadData()
+    {
+        initiatives    = Db.Initiatives.ToList();
+        allVolunteers  = Db.Volunteers.ToList();
+        polls          = Db.Polls.ToList();
+        allPollOptions = Db.PollOptions.ToList();
+        mentorPersons  = Db.MentorPersons.ToList();
+        foreach (var init in initiatives)
+        {
+            if (!newVolName.ContainsKey(init.Id))  newVolName[init.Id]  = "";
+            if (!newVolHours.ContainsKey(init.Id)) newVolHours[init.Id] = 1;
+        }
+    }
+
+    void SaveInitiative()
+    {
+        if (string.IsNullOrWhiteSpace(initName)) return;
+        Db.Initiatives.Add(new Initiative { Name = initName, Description = initDescription });
+        Db.SaveChanges();
+        initName = initDescription = ""; showInitForm = false;
+        LoadData();
+    }
+
+    void DeleteInitiative(Initiative init)
+    {
+        var vols = Db.Volunteers.Where(v => v.InitiativeId == init.Id).ToList();
+        Db.Volunteers.RemoveRange(vols);
+        Db.Initiatives.Remove(init);
+        Db.SaveChanges();
+        LoadData();
+    }
+
+    void AddVolunteer(int initId)
+    {
+        if (!newVolName.TryGetValue(initId, out var name) || string.IsNullOrWhiteSpace(name)) return;
+        newVolHours.TryGetValue(initId, out var hours);
+        Db.Volunteers.Add(new Volunteer { InitiativeId = initId, Name = name, Hours = hours < 1 ? 1 : hours });
+        Db.SaveChanges();
+        newVolName[initId] = ""; newVolHours[initId] = 1;
+        LoadData();
+    }
+
+    void DeleteVolunteer(Volunteer v)
+    {
+        Db.Volunteers.Remove(v);
+        Db.SaveChanges();
+        LoadData();
+    }
+
+    void OpenPollForm() { showPollForm = true; pollQuestion = ""; pollOptions = new() { string.Empty, string.Empty }; }
+
+    void SavePoll()
+    {
+        if (string.IsNullOrWhiteSpace(pollQuestion)) return;
+        var opts = pollOptions.Where(o => !string.IsNullOrWhiteSpace(o)).ToList();
+        if (opts.Count < 2) return;
+        var poll = new Poll { Question = pollQuestion };
+        Db.Polls.Add(poll);
+        Db.SaveChanges();
+        foreach (var o in opts)
+            Db.PollOptions.Add(new PollOption { PollId = poll.Id, Text = o });
+        Db.SaveChanges();
+        showPollForm = false;
+        LoadData();
+    }
+
+    void Vote(PollOption opt)
+    {
+        var o = Db.PollOptions.Find(opt.Id);
+        if (o == null) return;
+        o.Votes++;
+        Db.SaveChanges();
+        LoadData();
+    }
+
+    void DeletePoll(Poll poll)
+    {
+        var opts = Db.PollOptions.Where(o => o.PollId == poll.Id).ToList();
+        Db.PollOptions.RemoveRange(opts);
+        Db.Polls.Remove(poll);
+        Db.SaveChanges();
+        LoadData();
+    }
+
+    void SaveMentor()
+    {
+        if (string.IsNullOrWhiteSpace(mentorName)) return;
+        Db.MentorPersons.Add(new MentorPerson { Name = mentorName, Role = mentorRole });
+        Db.SaveChanges();
+        mentorName = ""; showMentorForm = false;
+        LoadData();
+    }
+
+    void UpdatePairing(MentorPerson m, string pairedWith)
+    {
+        var mp = Db.MentorPersons.Find(m.Id);
+        if (mp == null) return;
+        mp.PairedWith = pairedWith;
+        Db.SaveChanges();
+        LoadData();
+    }
+
+    void DeleteMentor(MentorPerson m)
+    {
+        Db.MentorPersons.Remove(m);
+        Db.SaveChanges();
+        LoadData();
+    }
+}

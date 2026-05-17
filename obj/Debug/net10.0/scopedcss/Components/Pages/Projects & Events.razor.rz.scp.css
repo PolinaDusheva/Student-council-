@@ -1,0 +1,61 @@
+/* Проекти и събития — розово/магента */
+
+.dept-content[b-j6xt3phnvt] {
+    background-color: #FDF0F8;
+    margin: -1.1rem -2rem 0;
+    padding: 0 2rem 2rem;
+    min-height: calc(100vh - 3.5rem);
+}
+
+.page-header[b-j6xt3phnvt] {
+    background-color: #8B1A45;
+    border-radius: 0 0 14px 14px;
+}
+
+.section-heading[b-j6xt3phnvt] {
+    border-left-color: #C03565;
+    color: #5A0A28;
+}
+
+.btn-primary[b-j6xt3phnvt] {
+    background-color: #8B1A45;
+    border-color: #6A0F34;
+    color: #fff;
+}
+
+.btn-primary:hover[b-j6xt3phnvt], .btn-primary:focus[b-j6xt3phnvt] {
+    background-color: #6A0F34;
+    border-color: #4A0020;
+    color: #fff;
+}
+
+.btn-outline-primary[b-j6xt3phnvt] {
+    color: #8B1A45;
+    border-color: #8B1A45;
+}
+
+.btn-outline-primary:hover[b-j6xt3phnvt] {
+    background-color: #8B1A45;
+    border-color: #8B1A45;
+    color: #fff;
+}
+
+.badge-amber[b-j6xt3phnvt] {
+    background-color: #C03565;
+}
+
+.badge-brown[b-j6xt3phnvt] {
+    background-color: #6A0F34;
+}
+
+.sc-table thead[b-j6xt3phnvt] {
+    background-color: #8B1A45;
+}
+
+.sc-card:hover[b-j6xt3phnvt] {
+    box-shadow: 0 4px 14px rgba(139, 26, 69, 0.18);
+}
+
+.sc-table tbody tr:hover[b-j6xt3phnvt] {
+    background-color: #F8E0EC;
+}

@@ -1,0 +1,61 @@
+/* Социално битов — оранжево/кехлибарено */
+
+.dept-content {
+    background-color: #FDF5E0;
+    margin: -1.1rem -2rem 0;
+    padding: 0 2rem 2rem;
+    min-height: calc(100vh - 3.5rem);
+}
+
+.page-header {
+    background-color: #B85010;
+    border-radius: 0 0 14px 14px;
+}
+
+.section-heading {
+    border-left-color: #E07820;
+    color: #5A2800;
+}
+
+.btn-primary {
+    background-color: #B85010;
+    border-color: #903A08;
+    color: #fff;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #903A08;
+    border-color: #6A2804;
+    color: #fff;
+}
+
+.btn-outline-primary {
+    color: #B85010;
+    border-color: #B85010;
+}
+
+.btn-outline-primary:hover {
+    background-color: #B85010;
+    border-color: #B85010;
+    color: #fff;
+}
+
+.badge-amber {
+    background-color: #E07820;
+}
+
+.badge-brown {
+    background-color: #903A08;
+}
+
+.sc-table thead {
+    background-color: #B85010;
+}
+
+.sc-card:hover {
+    box-shadow: 0 4px 14px rgba(184, 80, 16, 0.18);
+}
+
+.sc-table tbody tr:hover {
+    background-color: #FBE8C0;
+}

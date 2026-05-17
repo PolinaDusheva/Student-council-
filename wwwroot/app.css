@@ -1,0 +1,280 @@
+:root {
+    --cream:        #F5E8D0;
+    --light-cream:  #FAF3E8;
+    --dark-brown:   #2B1005;
+    --medium-brown: #7A3B1E;
+    --amber:        #C4843A;
+    --amber-light:  #D9A05A;
+    --text-dark:    #2B1005;
+    --text-muted:   #6B4A30;
+    --white:        #FFFFFF;
+    --border:       #E2C99A;
+}
+
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: var(--light-cream);
+    color: var(--text-dark);
+}
+
+a, .btn-link {
+    color: var(--medium-brown);
+}
+
+a:hover {
+    color: var(--amber);
+}
+
+/* ── Buttons ── */
+.btn-primary {
+    color: var(--white);
+    background-color: var(--amber);
+    border-color: var(--medium-brown);
+}
+
+.btn-primary:hover {
+    background-color: var(--medium-brown);
+    border-color: var(--dark-brown);
+    color: var(--white);
+}
+
+.btn-outline-primary {
+    color: var(--medium-brown);
+    border-color: var(--amber);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--amber);
+    border-color: var(--amber);
+    color: var(--white);
+}
+
+.btn-danger {
+    background-color: #8B2020;
+    border-color: #6B1010;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem var(--white), 0 0 0 0.25rem var(--amber);
+}
+
+/* ── Page titles ── */
+.page-header {
+    background-color: var(--dark-brown);
+    color: var(--white);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    border-radius: 0 0 12px 12px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    letter-spacing: 0.03em;
+}
+
+.page-header p {
+    margin: 0.4rem 0 0;
+    opacity: 0.75;
+    font-size: 0.95rem;
+}
+
+/* ── Cards ── */
+.sc-card {
+    background-color: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 6px rgba(43, 16, 5, 0.08);
+    transition: box-shadow 0.2s;
+}
+
+.sc-card:hover {
+    box-shadow: 0 4px 14px rgba(43, 16, 5, 0.14);
+}
+
+.sc-card-title {
+    font-weight: 700;
+    color: var(--dark-brown);
+    font-size: 1.05rem;
+    margin-bottom: 0.35rem;
+}
+
+.sc-card-meta {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+/* ── Department overview cards (Home) ── */
+.dept-card {
+    background-color: var(--dark-brown);
+    color: var(--white);
+    border-radius: 12px;
+    padding: 1.75rem 1.5rem;
+    text-decoration: none;
+    display: block;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 3px solid transparent;
+    height: 100%;
+}
+
+.dept-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(43, 16, 5, 0.25);
+    border-color: var(--amber);
+    color: var(--white);
+}
+
+.dept-card .dept-icon {
+    font-size: 2.4rem;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.dept-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    color: var(--amber-light);
+}
+
+.dept-card p {
+    font-size: 0.88rem;
+    opacity: 0.8;
+    margin: 0;
+}
+
+/* ── Section headings ── */
+.section-heading {
+    color: var(--dark-brown);
+    font-weight: 700;
+    border-left: 4px solid var(--amber);
+    padding-left: 0.75rem;
+    margin: 1.5rem 0 1rem;
+    font-size: 1.1rem;
+}
+
+/* ── Badge / status ── */
+.badge-amber {
+    background-color: var(--amber);
+    color: var(--white);
+    padding: 0.25em 0.6em;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.badge-brown {
+    background-color: var(--medium-brown);
+    color: var(--white);
+    padding: 0.25em 0.6em;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+/* ── Form elements ── */
+.form-control, .form-select {
+    border-color: var(--border);
+    background-color: var(--light-cream);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--amber);
+    background-color: var(--white);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+}
+
+/* ── Table ── */
+.sc-table {
+    background-color: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(43, 16, 5, 0.08);
+}
+
+.sc-table thead {
+    background-color: var(--dark-brown);
+    color: var(--white);
+}
+
+.sc-table tbody tr:hover {
+    background-color: var(--cream);
+}
+
+/* ── Content area ── */
+.content {
+    padding-top: 0;
+}
+
+h1:focus {
+    outline: none;
+}
+
+/* ── Validation ── */
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid #b32121;
+}
+
+.validation-message {
+    color: #b32121;
+}
+
+/* ── Error UI ── */
+.blazor-error-boundary {
+    background: #b32121;
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: white;
+}
+
+.blazor-error-boundary::after {
+    content: "Възникна грешка."
+}
+
+#blazor-error-ui {
+    color-scheme: light only;
+    background: #fef3cd;
+    border-top: 2px solid var(--amber);
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    color: var(--dark-brown);
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+.darker-border-checkbox.form-check-input {
+    border-color: var(--border);
+}
+
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
+    color: var(--text-muted);
+    text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}

@@ -1,0 +1,53 @@
+/* PR отдел — бордо/тъмновишнево */
+
+.dept-content[b-mayejn04ti] {
+    background-color: #FDF0F2;
+    margin: -1.1rem -2rem 0;
+    padding: 0 2rem 2rem;
+    min-height: calc(100vh - 3.5rem);
+}
+
+.page-header[b-mayejn04ti] {
+    background-color: #8C1B28;
+    border-radius: 0 0 14px 14px;
+}
+
+.section-heading[b-mayejn04ti] {
+    border-left-color: #B04050;
+    color: #5A0A15;
+}
+
+.btn-primary[b-mayejn04ti] {
+    background-color: #8C1B28;
+    border-color: #6A0F1E;
+    color: #fff;
+}
+
+.btn-primary:hover[b-mayejn04ti], .btn-primary:focus[b-mayejn04ti] {
+    background-color: #6A0F1E;
+    border-color: #4A0010;
+    color: #fff;
+}
+
+.btn-outline-primary[b-mayejn04ti] {
+    color: #8C1B28;
+    border-color: #8C1B28;
+}
+
+.btn-outline-primary:hover[b-mayejn04ti] {
+    background-color: #8C1B28;
+    border-color: #8C1B28;
+    color: #fff;
+}
+
+.badge-amber[b-mayejn04ti] {
+    background-color: #B04050;
+}
+
+.sc-table thead[b-mayejn04ti] {
+    background-color: #8C1B28;
+}
+
+.sc-card:hover[b-mayejn04ti] {
+    box-shadow: 0 4px 14px rgba(140, 27, 40, 0.18);
+}
