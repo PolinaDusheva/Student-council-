@@ -216,3 +216,4 @@
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/StudentCouncil.pdb
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/StudentCouncil.genruntimeconfig.cache
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/ref/StudentCouncil.dll
+/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/StudentCouncil.sourcelink.json
