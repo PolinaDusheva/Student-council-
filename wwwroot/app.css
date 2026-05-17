@@ -13,7 +13,12 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: var(--light-cream);
+    background-image: linear-gradient(90deg,
+        rgba(137, 58, 180, 0.55)  0%,
+        rgba(253, 29,  29,  0.69) 51%,
+        rgba(252, 176, 69,  0.82) 100%);
+    background-attachment: fixed;
+    background-color: #FAF3E8;
     color: var(--text-dark);
 }
 
@@ -82,17 +87,19 @@ a:hover {
 
 /* ── Cards ── */
 .sc-card {
-    background-color: var(--white);
-    border: 1px solid var(--border);
+    background-color: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 10px;
     padding: 1.25rem 1.5rem;
     margin-bottom: 1.25rem;
-    box-shadow: 0 2px 6px rgba(43, 16, 5, 0.08);
-    transition: box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(8px);
+    transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .sc-card:hover {
-    box-shadow: 0 4px 14px rgba(43, 16, 5, 0.14);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    transform: translateY(-1px);
 }
 
 .sc-card-title {
@@ -194,10 +201,11 @@ a:hover {
 
 /* ── Table ── */
 .sc-table {
-    background-color: var(--white);
+    background-color: rgba(255, 255, 255, 0.92);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(43, 16, 5, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(8px);
 }
 
 .sc-table thead {

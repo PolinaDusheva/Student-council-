@@ -7,16 +7,24 @@
 
 main[b-c6k7ldyfjw] {
     flex: 1;
+    background-image: linear-gradient(90deg,
+        rgba(137, 58, 180, 0.55)  0%,
+        rgba(253, 29,  29,  0.69) 51%,
+        rgba(252, 176, 69,  0.82) 100%);
+    background-attachment: fixed;
     background-color: #FAF3E8;
 }
 
 .sidebar[b-c6k7ldyfjw] {
-    background: linear-gradient(180deg, #2B1005 0%, #5A2410 100%);
+    background: linear-gradient(180deg,
+        rgba(137, 58, 180, 1)   0%,
+        rgba(200, 29, 60, 1)   50%,
+        rgba(252, 176, 69, 1)  100%);
 }
 
 .top-row[b-c6k7ldyfjw] {
-    background-color: #F5E8D0;
-    border-bottom: 2px solid #C4843A;
+    background-color: #ede8f5;
+    border-bottom: 2px solid #c8aee8;
     justify-content: flex-end;
     height: 3.5rem;
     display: flex;
@@ -27,13 +35,13 @@ main[b-c6k7ldyfjw] {
         white-space: nowrap;
         margin-left: 1.5rem;
         text-decoration: none;
-        color: #7A3B1E;
+        color: #3a1060;
         font-weight: 600;
         font-size: 0.85rem;
     }
 
     .top-row[b-c6k7ldyfjw]  a:hover, .top-row[b-c6k7ldyfjw]  .btn-link:hover {
-        color: #C4843A;
+        color: #893ab4;
         text-decoration: none;
     }
 
@@ -121,15 +129,19 @@ main[b-c6k7ldyfjw] {
 }
 
 .top-row[b-412ghq6b0y] {
-    min-height: 3.5rem;
-    background-color: rgba(0, 0, 0, 0.35);
-    border-bottom: 1px solid rgba(196, 132, 58, 0.4);
+    height: 3.5rem;
+    background-color: #ede8f5;
+    border-bottom: 2px solid #c8aee8;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex;
+    align-items: center;
 }
 
 .navbar-brand[b-412ghq6b0y] {
     font-size: 1rem;
     font-weight: 700;
-    color: #F5E8D0 !important;
+    color: #3a1060 !important;
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
@@ -193,7 +205,7 @@ main[b-c6k7ldyfjw] {
     font-size: 0.65rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: rgba(196, 132, 58, 0.8);
+    color: rgba(255, 220, 180, 0.9);
     padding: 1rem 1.25rem 0.3rem;
     font-weight: 700;
 }
@@ -226,9 +238,9 @@ main[b-c6k7ldyfjw] {
     }
 
 .nav-item[b-412ghq6b0y]  a.active {
-    background-color: rgba(196, 132, 58, 0.25);
-    color: #F5E8D0;
-    border-left: 3px solid #C4843A;
+    background-color: rgba(255, 255, 255, 0.22);
+    color: #FFFFFF;
+    border-left: 3px solid rgba(255, 255, 255, 0.8);
     padding-left: calc(1rem - 3px);
 }
 

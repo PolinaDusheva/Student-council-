@@ -155,7 +155,6 @@
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/scopedcss/Components/Pages/Sport.razor.rz.scp.css
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/scopedcss/bundle/StudentCouncil.styles.css
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/scopedcss/projectbundle/StudentCouncil.bundle.scp.css
-/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/8wvbawf7c1-{0}-x8ens16gl7-x8ens16gl7.gz
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/hra953nj62-{0}-bqjiyaj88i-bqjiyaj88i.gz
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/ejl83z4nfs-{0}-c2jlpeoesf-c2jlpeoesf.gz
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/zsexkv234k-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -203,8 +202,6 @@
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/hgmy6ox5xr-{0}-cyz5k529gx-cyz5k529gx.gz
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/m7xq81il5v-{0}-ax6tuj8tun-ax6tuj8tun.gz
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/mrb95h7sad-{0}-zr4b1gdhaw-zr4b1gdhaw.gz
-/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/w5yrsc10bb-{0}-1dt29nhrfa-1dt29nhrfa.gz
-/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/efzv32a5w0-{0}-1dt29nhrfa-1dt29nhrfa.gz
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/staticwebassets.build.json
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/staticwebassets.build.json.cache
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/staticwebassets.development.json
@@ -217,3 +214,6 @@
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/StudentCouncil.genruntimeconfig.cache
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/ref/StudentCouncil.dll
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/StudentCouncil.sourcelink.json
+/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/8wvbawf7c1-{0}-hu9d4yj9lm-hu9d4yj9lm.gz
+/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/w5yrsc10bb-{0}-shvm0q9hcx-shvm0q9hcx.gz
+/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/efzv32a5w0-{0}-shvm0q9hcx-shvm0q9hcx.gz

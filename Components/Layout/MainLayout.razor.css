@@ -6,16 +6,24 @@
 
 main {
     flex: 1;
+    background-image: linear-gradient(90deg,
+        rgba(137, 58, 180, 0.55)  0%,
+        rgba(253, 29,  29,  0.69) 51%,
+        rgba(252, 176, 69,  0.82) 100%);
+    background-attachment: fixed;
     background-color: #FAF3E8;
 }
 
 .sidebar {
-    background: linear-gradient(180deg, #2B1005 0%, #5A2410 100%);
+    background: linear-gradient(180deg,
+        rgba(137, 58, 180, 1)   0%,
+        rgba(200, 29, 60, 1)   50%,
+        rgba(252, 176, 69, 1)  100%);
 }
 
 .top-row {
-    background-color: #F5E8D0;
-    border-bottom: 2px solid #C4843A;
+    background-color: #ede8f5;
+    border-bottom: 2px solid #c8aee8;
     justify-content: flex-end;
     height: 3.5rem;
     display: flex;
@@ -26,13 +34,13 @@ main {
         white-space: nowrap;
         margin-left: 1.5rem;
         text-decoration: none;
-        color: #7A3B1E;
+        color: #3a1060;
         font-weight: 600;
         font-size: 0.85rem;
     }
 
     .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        color: #C4843A;
+        color: #893ab4;
         text-decoration: none;
     }
 
