@@ -1,5 +1,27 @@
+@* ============================================================
+   ФАЙЛ: Components/Pages/PR.razor
+   ЦЕЛЬ: Страница на PR отдела — управление на новини (NewsPost)
+         и график за публикации в социалните мрежи (ScheduledPost).
+
+   КОНЦЕПЦИИ В ТОЗИ ФАЙЛ:
+   - Два независими CRUD раздела в един компонент
+   - @foreach за динамично генериране на опции от база данни
+   - @onchange с lambda за radio buttons (ограничение на @bind с радио)
+   - Условно показване на изображение (@if + IsNullOrWhiteSpace)
+   - Два отделни булеви флага за два различни форми
+   ============================================================ *@
+
+@* @page "/PR" — URL маршрутът. Главната буква P и R са задължителни,
+   Blazor routing е case-sensitive по подразбиране в production. *@
 @page "/PR"
+
+@* InteractiveServer — компонентът работи на сървъра, промените в UI
+   се изпращат към браузъра чрез WebSocket (SignalR). *@
 @rendermode InteractiveServer
+
+@* @inject AppDbContext Db — DI инжектира нашия DbContext.
+   Тъй като е "scoped", живее за времето на SignalR сесията
+   (докато потребителят е на страницата). *@
 @inject AppDbContext Db
 
 <PageTitle>PR отдел &mdash; Студентски съвет</PageTitle>
@@ -10,30 +32,41 @@
     <p>Управление на новини, публикации и социални мрежи</p>
 </div>
 
-<!-- ── Новини ── -->
+@* ── Новини ────────────────────────────────────────────────────────────── *@
 <h2 class="section-heading">Новини</h2>
 
+@* showNewsForm е булев флаг в @code — true показва формата, false скрива *@
 @if (showNewsForm)
 {
     <div class="sc-card mb-3">
+        @* editingId == 0 означава нов запис, ненула — редакция *@
         <div class="sc-card-title mb-3">@(editingId == 0 ? "Добави новина" : "Редактирай новина")</div>
         <div class="row g-2">
             <div class="col-12 col-md-6">
                 <label class="form-label">Заглавие</label>
+                @* @bind свързва input стойността с C# променливата newsTitle.
+                   При всяка промяна в полето (onchange), newsTitle се обновява. *@
                 <input class="form-control" @bind="newsTitle" placeholder="Заглавие на новината"/>
             </div>
             <div class="col-12 col-md-6">
                 <label class="form-label">Автор</label>
+                @* @bind на <select> — избраната опция се синхронизира с newsAuthor.
+                   Опциите се генерират динамично от membersList (зареден от базата). *@
                 <select class="form-select" @bind="newsAuthor">
                     <option value="">— изберете автор —</option>
+                    @* @foreach итерира по List<Member> и генерира <option> за всеки.
+                       Това е динамично рендиране — ако добавим нов член в базата,
+                       следващото зареждане ще покаже и него тук. *@
                     @foreach (var m in membersList)
                     {
+                        @* value="@m.Name" — при избор на тази опция newsAuthor = m.Name *@
                         <option value="@m.Name">@m.Name</option>
                     }
                 </select>
             </div>
             <div class="col-12">
                 <label class="form-label">Съдържание</label>
+                @* @bind работи и за <textarea> *@
                 <textarea class="form-control" rows="3" @bind="newsBody" placeholder="Текст на новината..."></textarea>
             </div>
             <div class="col-12">
@@ -52,6 +85,7 @@ else
     <button class="btn btn-primary mb-3" @onclick="OpenNewsForm">&#43; Добави новина</button>
 }
 
+@* Ако списъкът е празен, показваме съобщение вместо празна таблица. *@
 @if (newsList.Count == 0)
 {
     <p class="text-muted fst-italic">Няма добавени новини.</p>
@@ -59,18 +93,24 @@ else
 else
 {
     <div class="row g-3 mb-4">
+        @* @foreach итерира по newsList — List<NewsPost> зареден от базата *@
         @foreach (var n in newsList)
         {
             <div class="col-12 col-md-6">
                 <div class="sc-card">
+                    @* Условно показваме снимката само ако URL-ът не е празен.
+                       IsNullOrWhiteSpace проверява null, "" и "   " едновременно. *@
                     @if (!string.IsNullOrWhiteSpace(n.ImageUrl))
                     {
                         <img src="@n.ImageUrl" alt="" style="width:100%; height:140px; object-fit:cover; border-radius:6px; margin-bottom:0.75rem;"/>
                     }
                     <div class="sc-card-title">@n.Title</div>
+                    @* DateTime.ToString("dd.MM.yyyy") форматира датата като "18.05.2026" *@
                     <div class="sc-card-meta"><i class="bi bi-person"></i> @n.Author &nbsp;|&nbsp; <i class="bi bi-calendar3"></i> @n.Date.ToString("dd.MM.yyyy")</div>
                     <p style="font-size:0.9rem; color:var(--text-muted);">@n.Body</p>
                     <div class="d-flex gap-2 mt-2">
+                        @* Lambda в @onclick: () => EditNews(n) — "уловена" (captured)
+                           локалната променлива n, за да работи правилно при foreach. *@
                         <button class="btn btn-sm btn-outline-primary" @onclick="() => EditNews(n)">Редактирай</button>
                         <button class="btn btn-sm btn-danger text-white" @onclick="() => DeleteNews(n)">Изтрий</button>
                     </div>
@@ -80,16 +120,21 @@ else
     </div>
 }
 
-<!-- ── График за публикации ── -->
+@* ── График за публикации ──────────────────────────────────────────────── *@
 <h2 class="section-heading">График за публикации</h2>
 
+@* showPostForm е ОТДЕЛЕН булев флаг от showNewsForm —
+   двата раздела са независими и могат да са отворени едновременно. *@
 @if (showPostForm)
 {
     <div class="sc-card mb-3">
-        <div class="sc-card-title mb-3">Планирай публикация</div>
+        @* editingPostId == 0 → нова публикация; ненула → редакция *@
+        <div class="sc-card-title mb-3">@(editingPostId == 0 ? "Планирай публикация" : "Редактирай публикация")</div>
         <div class="row g-2">
             <div class="col-12 col-md-4">
                 <label class="form-label">Дата</label>
+                @* type="date" рендира нативния date picker на браузъра.
+                   @bind на DateTime работи с ISO формат зад кулисите. *@
                 <input type="date" class="form-control" @bind="postDate"/>
             </div>
             <div class="col-12 col-md-4">
@@ -103,6 +148,12 @@ else
             <div class="col-12 col-md-4">
                 <label class="form-label">Статус</label>
                 <div class="d-flex flex-column gap-1 mt-1">
+                    @* Radio buttons: @bind НЕ работи директно за radio в Blazor,
+                       затова ползваме комбинация от:
+                       checked="@(postStatus == "...")" — определя кой е отметнат
+                       @onchange="@(() => postStatus = "...")" — обновява стойността при избор.
+                       @onchange получава ChangeEventArgs, но ние игнорираме стойността
+                       и директно задаваме фиксирания string. *@
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="postStatus" value="Чернова"
                                checked="@(postStatus == "Чернова")" @onchange="@(() => postStatus = "Чернова")"/>
@@ -127,13 +178,15 @@ else
         </div>
         <div class="mt-3 d-flex gap-2">
             <button class="btn btn-primary" @onclick="SavePost">Запази</button>
-            <button class="btn btn-outline-secondary" @onclick="() => showPostForm = false">Откажи</button>
+            @* Inline lambda: () => showPostForm = false — директно задаваме стойност
+               без отделен метод. Подходящо за прости едноредови действия. *@
+            <button class="btn btn-outline-secondary" @onclick="CancelPostForm">Откажи</button>
         </div>
     </div>
 }
 else
 {
-    <button class="btn btn-primary mb-3" @onclick="() => showPostForm = true">&#43; Добави публикация</button>
+    <button class="btn btn-primary mb-3" @onclick="OpenPostForm">&#43; Добави публикация</button>
 }
 
 @if (postList.Count == 0)
@@ -156,8 +209,21 @@ else
                         <td>@p.Date.ToString("dd.MM.yyyy")</td>
                         <td>@p.Platform</td>
                         <td>@p.Description</td>
-                        <td><span class="badge-amber">@p.Status</span></td>
                         <td>
+                            @* Inline смяна на статус — без отделна форма.
+                               value="@p.Status" показва текущия статус в dropdown-а.
+                               @onchange (не @bind) защото трябва да извикаме метод с параметри. *@
+                            <select class="form-select form-select-sm" style="width:auto;"
+                                    value="@p.Status"
+                                    @onchange="e => UpdatePostStatus(p, e.Value?.ToString() ?? p.Status)">
+                                <option>Чернова</option>
+                                <option>Планирана</option>
+                                <option>Публикувана</option>
+                            </select>
+                        </td>
+                        <td class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-primary" @onclick="() => EditPost(p)">Редактирай</button>
+                            @* &#x2715; е HTML entity за символа "✕" (X за затваряне) *@
                             <button class="btn btn-sm btn-danger text-white" @onclick="() => DeletePost(p)">&#x2715;</button>
                         </td>
                     </tr>
@@ -170,43 +236,71 @@ else
 </div>
 
 @code {
+    // Три списъка — всеки представлява зареден DbSet от базата.
+    // List<T> е generic колекция: може да съдържа само обекти от тип T.
     List<NewsPost> newsList = new();
     List<ScheduledPost> postList = new();
+    // membersList се зарежда, за да попълним падащите менюта с автори.
     List<Member> membersList = new();
 
+    // ── State за формата за новини ──────────────────────────────────────
+    // Всеки от тези bool/string полета е UI state, НЕ модел на базата.
     bool showNewsForm;
+    // editingId = 0 → добавяме; ненула → редактираме конкретен Id
     int editingId;
     string newsTitle = "", newsAuthor = "", newsBody = "", newsImage = "";
 
+    // ── State за формата за публикации ──────────────────────────────────
     bool showPostForm;
+    // editingPostId = 0 → добавяме нова; ненула → редактираме конкретна по Id.
+    int editingPostId;
+    // DateTime.Today взима само датата без часа (00:00:00).
     DateTime postDate = DateTime.Today;
+    // Стойности по подразбиране за падащите менюта в новата публикация.
     string postPlatform = "Instagram", postStatus = "Чернова", postDescription = "";
 
+    // OnInitialized() — жизнен цикъл: извиква се при първо зареждане.
+    // Тук зареждаме всичко от базата наведнъж.
     protected override void OnInitialized()
     {
+        // .ToList() изпълнява SELECT * FROM NewsPosts и зарежда в паметта.
         newsList = Db.NewsPosts.ToList();
+        // .ToList() изпълнява SELECT * FROM ScheduledPosts
         postList = Db.ScheduledPosts.ToList();
+        // Зареждаме членовете за падащото меню "Автор"
         membersList = Db.Members.ToList();
     }
 
+    // Нулираме формата и показваме я за нов запис.
     void OpenNewsForm()
     {
         showNewsForm = true;
         editingId = 0;
+        // Multiple assignment: C# позволява a = b = c = "" — присвоява
+        // от дясно на ляво: newsImage = "", newsBody = newsImage, и т.н.
         newsTitle = newsAuthor = newsBody = newsImage = "";
     }
 
-    void CancelNewsForm() { showNewsForm = false; editingId = 0; }
+    void CancelNewsForm()
+    {
+        showNewsForm = false; 
+        editingId = 0;
+    }
 
     void SaveNews()
     {
+        // Ако заглавието е празно — не запазваме. Основна валидация.
         if (string.IsNullOrWhiteSpace(newsTitle)) return;
 
         if (editingId != 0)
         {
+            // Find(editingId): EF Core търси в кеша или прави
+            // SELECT * FROM NewsPosts WHERE Id = @editingId
             var existing = Db.NewsPosts.Find(editingId);
             if (existing != null)
             {
+                // EF Core change tracking: промяната на свойствата
+                // автоматично ще генерира UPDATE при SaveChanges().
                 existing.Title = newsTitle;
                 existing.Author = newsAuthor;
                 existing.Body = newsBody;
@@ -215,6 +309,9 @@ else
         }
         else
         {
+            // Object initializer синтаксис: new NewsPost { Prop = val, ... }
+            // Попълваме всички полета при създаването.
+            // Date се задава автоматично като DateTime.Today.
             Db.NewsPosts.Add(new NewsPost
             {
                 Title = newsTitle,
@@ -225,11 +322,14 @@ else
             });
         }
 
+        // SaveChanges(): записва INSERT или UPDATE в базата данни.
         Db.SaveChanges();
+        // Презареждаме — включваме новото/редактираното в списъка.
         newsList = Db.NewsPosts.ToList();
         CancelNewsForm();
     }
 
+    // Попълва формата с данните на избраната новина за редакция.
     void EditNews(NewsPost n)
     {
         editingId = n.Id;
@@ -242,25 +342,76 @@ else
 
     void DeleteNews(NewsPost n)
     {
+        // Remove маркира обекта за изтриване.
+        // SaveChanges генерира: DELETE FROM NewsPosts WHERE Id = @id
         Db.NewsPosts.Remove(n);
         Db.SaveChanges();
         newsList = Db.NewsPosts.ToList();
     }
 
+    // Отваря формата за нова публикация с начални стойности.
+    void OpenPostForm()
+    {
+        editingPostId = 0;
+        postDate = DateTime.Today; postPlatform = "Instagram";
+        postStatus = "Чернова"; postDescription = "";
+        showPostForm = true;
+    }
+
+    // Попълва формата с данните на избраната публикация за редакция.
+    void EditPost(ScheduledPost p)
+    {
+        editingPostId = p.Id;
+        postDate = p.Date; postPlatform = p.Platform;
+        postStatus = p.Status; postDescription = p.Description;
+        showPostForm = true;
+    }
+
+    void CancelPostForm() { showPostForm = false; editingPostId = 0; }
+
     void SavePost()
     {
         if (string.IsNullOrWhiteSpace(postDescription)) return;
-        Db.ScheduledPosts.Add(new ScheduledPost
+
+        if (editingPostId != 0)
         {
-            Date = postDate,
-            Platform = postPlatform,
-            Status = postStatus,
-            Description = postDescription
-        });
+            // Find(editingPostId): EF Core търси в кеша или прави SELECT по Id.
+            var existing = Db.ScheduledPosts.Find(editingPostId);
+            if (existing != null)
+            {
+                // EF Core change tracking: промяната на свойствата
+                // автоматично генерира UPDATE при SaveChanges().
+                existing.Date = postDate;
+                existing.Platform = postPlatform;
+                existing.Status = postStatus;
+                existing.Description = postDescription;
+            }
+        }
+        else
+        {
+            Db.ScheduledPosts.Add(new ScheduledPost
+            {
+                Date = postDate,
+                Platform = postPlatform,
+                Status = postStatus,
+                Description = postDescription
+            });
+        }
+
         Db.SaveChanges();
         postList = Db.ScheduledPosts.ToList();
-        postDescription = "";
-        showPostForm = false;
+        CancelPostForm();
+    }
+
+    void UpdatePostStatus(ScheduledPost p, string newStatus)
+    {
+        // Find взима прясна инстанция от базата — не работим с cached обекта от foreach.
+        var post = Db.ScheduledPosts.Find(p.Id);
+        if (post == null) return;
+        post.Status = newStatus;
+        // EF Core change tracking генерира: UPDATE ScheduledPosts SET Status = @newStatus WHERE Id = @id
+        Db.SaveChanges();
+        postList = Db.ScheduledPosts.ToList();
     }
 
     void DeletePost(ScheduledPost p)
