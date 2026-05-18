@@ -1,19 +1,3 @@
-@* ============================================================
-   ФАЙЛ: Components/Pages/Social and Community.razor
-   ЦЕЛЬ: Страница за социална дейност — три раздела:
-         1. Доброволчески инициативи с доброволци (релация 1:N)
-         2. Анкети с варианти за гласуване (релация 1:N)
-         3. (Структурата е готова за менторски програми)
-
-   КОНЦЕПЦИИ В ТОЗИ ФАЙЛ:
-   - Две нива на релации: Initiative → Volunteers, Poll → PollOptions
-   - .Where() в шаблона за свързване на дъщерни записи с родителски
-   - .Sum() за агрегирани стойности (общо часове, % гласове)
-   - Динамичен списък за опции на анкета (List<string> pollOptions)
-   - Каскадно изтриване (RemoveRange преди Remove за родителя)
-   - Изчисляване на проценти в шаблона
-   ============================================================ *@
-
 @page "/SocialAndCommunity"
 @rendermode InteractiveServer
 @inject AppDbContext Db
@@ -26,7 +10,6 @@
     <p>Доброволчество, анкети и менторски програми</p>
 </div>
 
-@* ── Доброволчески инициативи ──────────────────────────────────────────── *@
 <h2 class="section-heading">Доброволчески инициативи</h2>
 
 @if (showInitForm)
@@ -36,7 +19,7 @@
         <div class="row g-2">
             <div class="col-12 col-md-6">
                 <label class="form-label">Наименование</label>
-                @* @bind свързва стойността на initName с полето *@
+                
                 <input class="form-control" @bind="initName" placeholder="Название на инициативата"/>
             </div>
             <div class="col-12 col-md-6">
@@ -61,26 +44,22 @@ else
 }
 else
 {
-    @* @foreach по initiatives — рендираме карта за всяка инициатива *@
+    
     @foreach (var init in initiatives)
     {
-        @* Филтрираме доброволците в паметта: allVolunteers е зареден цялостно от базата,
-           а тук избираме само тези, свързани с текущата инициатива по InitiativeId.
-           Това е по-бързо от нова заявка към базата за всяка инициатива. *@
+        
         var volunteers = allVolunteers.Where(v => v.InitiativeId == init.Id).ToList();
         <div class="sc-card mb-3">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                 <div>
                     <div class="sc-card-title">@init.Name</div>
                     <div class="sc-card-meta">@init.Description</div>
-                    @* .Count е свойство на List<T> — брой елементи.
-                       .Sum(v => v.Hours) е LINQ агрегация: сумира Hours на всички v. *@
+                    
                     <div class="sc-card-meta"><i class="bi bi-person-check"></i> Записани: @volunteers.Count &nbsp;|&nbsp; <i class="bi bi-hourglass-split"></i> Общо часове: @volunteers.Sum(v => v.Hours)</div>
                 </div>
                 <button class="btn btn-sm btn-danger text-white" @onclick="() => DeleteInitiative(init)">Изтрий</button>
             </div>
-            @* Форма за записване на доброволец — под всяка инициатива.
-               newVolName и newVolHours са Dictionary — ключ = InitiativeId. *@
+            
             <div class="d-flex gap-2 mt-2 flex-wrap">
                 <input class="form-control form-control-sm" style="max-width:180px;"
                        @bind="newVolName[init.Id]" placeholder="Вашето име"/>
@@ -110,7 +89,6 @@ else
     }
 }
 
-@* ── Анкети и гласуване ────────────────────────────────────────────────── *@
 <h2 class="section-heading">Анкети и гласуване</h2>
 
 @if (showPollForm)
@@ -122,28 +100,24 @@ else
             <input class="form-control" @bind="pollQuestion" placeholder="Вашият въпрос..."/>
         </div>
         <label class="form-label">Варианти (минимум 2)</label>
-        @* pollOptions е List<string> — динамичен брой варианти.
-           @for с индекс защото трябва да модифицираме елементи по позиция. *@
+        
         @for (int i = 0; i < pollOptions.Count; i++)
         {
-            @* Важно: уловен индекс в локална var idx = i!
-               Без var idx = i, всички lambda-та ще затворят последната стойност на i. *@
+            
             var idx = i;
             <div class="d-flex gap-2 mb-1">
-                @* value="@pollOptions[idx]" — показва текущата стойност.
-                   @onchange (не @bind) — при промяна обновяваме конкретния елемент
-                   по индекс: pollOptions[idx] = новата стойност. *@
+                
                 <input class="form-control form-control-sm" value="@pollOptions[idx]"
                        @onchange="e => pollOptions[idx] = e.Value?.ToString() ?? string.Empty"/>
-                @* Показваме "Изтрий" само ако имаме повече от 2 варианта (минимумът). *@
+                
                 @if (pollOptions.Count > 2)
                 {
-                    @* RemoveAt(idx) премахва елемент по позиция от List<string>. *@
+                    
                     <button class="btn btn-sm btn-danger text-white" @onclick="() => pollOptions.RemoveAt(idx)">&#x2715;</button>
                 }
             </div>
         }
-        @* Add(string.Empty) добавя нов празен вариант в края на List<string>. *@
+        
         <button class="btn btn-sm btn-outline-primary mb-3" @onclick="() => pollOptions.Add(string.Empty)">&#43; Добави вариант</button>
         <div class="d-flex gap-2">
             <button class="btn btn-primary" @onclick="SavePoll">Създай</button>
@@ -164,10 +138,9 @@ else
 {
     @foreach (var poll in polls)
     {
-        @* Филтрираме опциите от глобалния списък по PollId.
-           Не правим нова заявка — просто LINQ .Where() в паметта. *@
+        
         var options = allPollOptions.Where(o => o.PollId == poll.Id).ToList();
-        @* .Sum(o => o.Votes) — общо гласове за тази анкета. *@
+        
         var totalVotes = options.Sum(o => o.Votes);
         <div class="sc-card mb-3">
             <div class="d-flex justify-content-between align-items-start">
@@ -176,17 +149,14 @@ else
             </div>
             @foreach (var opt in options)
             {
-                @* Изчисляваме процента за progress bar-а.
-                   Тернарен оператор: ако totalVotes == 0 → 0% (предпазваме от деление на нула).
-                   (int) cast преобразува double към int (закръгляне надолу). *@
+                
                 var pct = totalVotes == 0 ? 0 : (int)(100.0 * opt.Votes / totalVotes);
                 <div class="mb-2 mt-2">
                     <div class="d-flex justify-content-between mb-1">
                         <span style="font-size:0.9rem;">@opt.Text</span>
                         <span class="badge-amber">@opt.Votes гласа (@pct%)</span>
                     </div>
-                    @* Progress bar: width се задава динамично като процент.
-                       CSS transition:width 0.3s добавя анимация при смяна на стойността. *@
+                    
                     <div style="background:#E2C99A; border-radius:6px; height:10px; overflow:hidden;">
                         <div style="background:var(--amber); height:100%; width:@(pct)%; transition:width 0.3s;"></div>
                     </div>
@@ -197,49 +167,42 @@ else
     }
 }
 
-
 </div>
 
 @code {
-    // Четири колекции — двойки родител/деца за двете релации.
-    List<Initiative>  initiatives    = new();
-    List<Volunteer>   allVolunteers  = new();  // всички доброволци от базата
-    List<Poll>        polls          = new();
-    List<PollOption>  allPollOptions = new();  // всички опции от базата
 
-    // Dictionary<int, string>: ключ = InitiativeId, стойност = въвеждано от потребителя.
+    List<Initiative>  initiatives    = new();
+    List<Volunteer>   allVolunteers  = new();
+    List<Poll>        polls          = new();
+    List<PollOption>  allPollOptions = new();
+
     Dictionary<int, string> newVolName  = new();
-    // Dictionary<int, int>: ключ = InitiativeId, стойност = брой часове (int, не string).
+
     Dictionary<int, int>    newVolHours = new();
 
-    // ── State за инициативи ────────────────────────────────────────────
     bool showInitForm;
     string initName = "", initDescription = "";
 
-    // ── State за анкети ────────────────────────────────────────────────
     bool showPollForm;
     string pollQuestion = "";
-    // List<string> за динамичен брой варианти на анкетата.
-    // Инициализираме с 2 празни string-а (минимум 2 варианта).
+
     List<string> pollOptions = new() { string.Empty, string.Empty };
 
-    // OnInitialized(): стартово зареждане.
     protected override void OnInitialized()
     {
         LoadData();
     }
 
-    // LoadData(): презарежда всички четири колекции и инициализира речниците.
     void LoadData()
     {
         initiatives    = Db.Initiatives.ToList();
         allVolunteers  = Db.Volunteers.ToList();
         polls          = Db.Polls.ToList();
         allPollOptions = Db.PollOptions.ToList();
-        // Инициализираме речниците само за нови инициативи.
+
         foreach (var init in initiatives)
         {
-            // ContainsKey проверява дали ключът вече съществува.
+
             if (!newVolName.ContainsKey(init.Id))  newVolName[init.Id]  = "";
             if (!newVolHours.ContainsKey(init.Id)) newVolHours[init.Id] = 1;
         }
@@ -256,27 +219,25 @@ else
 
     void DeleteInitiative(Initiative init)
     {
-        // Трябва да изтрием доброволците ПРЕДИ инициативата!
-        // SQLite има foreign key constraints — не може да изтрие родител с деца.
-        // .Where(v => v.InitiativeId == init.Id).ToList() зарежда само свързаните.
+
         var vols = Db.Volunteers.Where(v => v.InitiativeId == init.Id).ToList();
-        // RemoveRange: по-ефективно от Remove() в цикъл за множество обекти.
+
         Db.Volunteers.RemoveRange(vols);
         Db.Initiatives.Remove(init);
-        // Всичко в една транзакция.
+
         Db.SaveChanges();
         LoadData();
     }
 
     void AddVolunteer(int initId)
     {
-        // TryGetValue: безопасно четене от Dictionary без изключение.
+
         if (!newVolName.TryGetValue(initId, out var name) || string.IsNullOrWhiteSpace(name)) return;
         newVolHours.TryGetValue(initId, out var hours);
-        // Ако hours < 1 (невалидна стойност) → задаваме минимум 1 час.
+
         Db.Volunteers.Add(new Volunteer { InitiativeId = initId, Name = name, Hours = hours < 1 ? 1 : hours });
         Db.SaveChanges();
-        // Нулираме само полетата за тази инициатива.
+
         newVolName[initId] = ""; newVolHours[initId] = 1;
         LoadData();
     }
@@ -288,28 +249,23 @@ else
         LoadData();
     }
 
-    // Нулира формата за анкета — 2 нови празни варианта за начало.
     void OpenPollForm() { showPollForm = true; pollQuestion = ""; pollOptions = new() { string.Empty, string.Empty }; }
 
     void SavePoll()
     {
         if (string.IsNullOrWhiteSpace(pollQuestion)) return;
-        // Филтрираме само непразните варианти от списъка.
-        // .Where(o => !IsNullOrWhiteSpace(o)) отсява празните полета.
+
         var opts = pollOptions.Where(o => !string.IsNullOrWhiteSpace(o)).ToList();
-        // Изискваме минимум 2 варианта за валидна анкета.
+
         if (opts.Count < 2) return;
 
-        // Създаваме анкетата и я записваме ПЪРВО, за да получим Id.
         var poll = new Poll { Question = pollQuestion };
         Db.Polls.Add(poll);
         Db.SaveChanges();
-        // Сега poll.Id е попълнен от базата — можем да го ползваме за PollOption.PollId.
 
-        // Добавяме всеки вариант с Foreign Key към новата анкета.
         foreach (var o in opts)
             Db.PollOptions.Add(new PollOption { PollId = poll.Id, Text = o });
-        // Втори SaveChanges() за PollOptions.
+
         Db.SaveChanges();
         showPollForm = false;
         LoadData();
@@ -317,10 +273,10 @@ else
 
     void Vote(PollOption opt)
     {
-        // Find взима прясна копия от базата (или кеша).
+
         var o = Db.PollOptions.Find(opt.Id);
         if (o == null) return;
-        // Инкрементална промяна — EF Core ще генерира UPDATE при SaveChanges().
+
         o.Votes++;
         Db.SaveChanges();
         LoadData();
@@ -328,7 +284,7 @@ else
 
     void DeletePoll(Poll poll)
     {
-        // Каскадно изтриване: първо опциите (деца), после анкетата (родител).
+
         var opts = Db.PollOptions.Where(o => o.PollId == poll.Id).ToList();
         Db.PollOptions.RemoveRange(opts);
         Db.Polls.Remove(poll);

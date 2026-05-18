@@ -1,18 +1,3 @@
-@* ============================================================
-   ФАЙЛ: Components/Pages/Projects & Events.razor
-   ЦЕЛЬ: Страница за управление на събития и задачи.
-         Два раздела: Събития (CouncilEvent) и Задачи (ProjectTask).
-
-   КОНЦЕПЦИИ В ТОЗИ ФАЙЛ:
-   - Dictionary<int, string> за управление на полета по Id
-   - LINQ .Where() и .OrderBy() в шаблона за филтриране без заявка към БД
-   - @code блок с inline UPDATE на статус (dropdown без форма)
-   - Разделяне на събитията на "Предстоящи" и "Минали" с LINQ
-   - allAttendees: всички участници заредени наведнъж, филтрирани в паметта
-   - Каскадно изтриване (участници преди събитие)
-   ============================================================ *@
-
-@* @page задава URL маршрута: /projectsAndEvents *@
 @page "/projectsAndEvents"
 @rendermode InteractiveServer
 @inject AppDbContext Db
@@ -25,29 +10,27 @@
     <p>Организация на инициативи, регистрации и задачи</p>
 </div>
 
-@* ── Събития ───────────────────────────────────────────────────────────── *@
 <h2 class="section-heading">Събития</h2>
 
-@* showEventForm: булев флаг за видимостта на формата за събитие *@
 @if (showEventForm)
 {
     <div class="sc-card mb-3">
-        @* Тернарен оператор: editingEventId == 0 значи добавяме ново *@
+        
         <div class="sc-card-title mb-3">@(editingEventId == 0 ? "Добави събитие" : "Редактирай събитие")</div>
         <div class="row g-2">
             <div class="col-12 col-md-6">
                 <label class="form-label">Наименование</label>
-                @* @bind свързва стойността на input-а с evName *@
+                
                 <input class="form-control" @bind="evName" placeholder="Название на събитието"/>
             </div>
             <div class="col-12 col-md-3">
                 <label class="form-label">Дата</label>
-                @* type="date" + @bind="evDate" — Blazor преобразува DateTime ↔ string формат *@
+                
                 <input type="date" class="form-control" @bind="evDate"/>
             </div>
             <div class="col-12 col-md-3">
                 <label class="form-label">Макс. участници</label>
-                @* type="number" + @bind — работи с int директно *@
+                
                 <input type="number" class="form-control" @bind="evMax" min="1"/>
             </div>
             <div class="col-12 col-md-6">
@@ -60,7 +43,7 @@
             </div>
             <div class="col-12 col-md-6">
                 <label class="form-label">Организатор</label>
-                @* Динамично генерираме <option> от membersList — зареден от DbSet<Member> *@
+                
                 <select class="form-select" @bind="evOrganizer">
                     <option value="">— изберете организатор —</option>
                     @foreach (var m in membersList)
@@ -81,10 +64,6 @@ else
     <button class="btn btn-primary mb-3" @onclick="OpenEventForm">&#43; Добави събитие</button>
 }
 
-@* Разделяме събитията на предстоящи и минали директно в шаблона.
-   @{ ... } е C# код блок в Razor — не генерира HTML, само изпълнява код.
-   .Where() е LINQ метод — работи върху заредения List<T>, НЕ върху базата.
-   .OrderBy() сортира: предстоящи — от най-скорошното, минали — от най-новото. *@
 @{
     var upcoming = eventList.Where(e => e.Date >= DateTime.Today).OrderBy(e => e.Date).ToList();
     var past     = eventList.Where(e => e.Date <  DateTime.Today).OrderByDescending(e => e.Date).ToList();
@@ -95,15 +74,13 @@ else
     <p class="text-muted fst-italic">Няма добавени събития.</p>
 }
 
-@* Показваме предстоящите само ако има такива *@
 @if (upcoming.Count > 0)
 {
     <p class="section-heading" style="font-size:0.9rem;">Предстоящи</p>
     <div class="row g-3 mb-3">
         @foreach (var ev in upcoming)
         {
-            @* Филтрираме участниците от глобалния списък по EventId — като при доброволците.
-               Не правим нова заявка — само LINQ .Where() в паметта. *@
+            
             var attendees = allAttendees.Where(a => a.EventId == ev.Id).ToList();
             <div class="col-12 col-md-6">
                 <div class="sc-card">
@@ -112,19 +89,17 @@ else
                         <i class="bi bi-geo-alt-fill"></i> @ev.Location &nbsp;|&nbsp;
                         <i class="bi bi-calendar3"></i> @ev.Date.ToString("dd.MM.yyyy")
                     </div>
-                    @* attendees.Count е броят реални записвания (от таблица EventAttendees). *@
+                    
                     <div class="sc-card-meta">
                         <i class="bi bi-people"></i> Записани: @attendees.Count / @ev.MaxParticipants
                         @(!string.IsNullOrEmpty(ev.Organizer) ? $" | Организатор: {ev.Organizer}" : "")
                     </div>
                     <p style="font-size:0.88rem; color:var(--text-muted);">@ev.Description</p>
 
-                    @* Форма за записване — показва се само ако има свободни места *@
                     @if (attendees.Count < ev.MaxParticipants)
                     {
                         <div class="d-flex gap-2 align-items-center mb-2">
-                            @* newAttendeeName е Dictionary<int, string> — ключ = EventId.
-                               Всяко събитие има свое отделно поле за въвеждане на участник. *@
+                            
                             <input class="form-control form-control-sm" style="max-width:200px;"
                                    @bind="newAttendeeName[ev.Id]" placeholder="Вашето име"/>
                             <button class="btn btn-sm btn-primary" @onclick="() => AddAttendee(ev.Id)">Запиши се</button>
@@ -135,7 +110,6 @@ else
                         <span class="badge-brown mb-2 d-inline-block">Местата са заети</span>
                     }
 
-                    @* Таблица с участниците — видима само ако има записани *@
                     @if (attendees.Count > 0)
                     {
                         <div class="sc-table table-responsive mt-2">
@@ -148,7 +122,7 @@ else
                                     {
                                         <tr>
                                             <td>@a.Name</td>
-                                            @* Lambda улавя конкретния обект a за всеки ред. *@
+                                            
                                             <td>
                                                 <button class="btn btn-sm btn-danger text-white"
                                                         @onclick="() => DeleteAttendee(a)">&#x2715;</button>
@@ -170,7 +144,6 @@ else
     </div>
 }
 
-@* Минали събития — показват се по-прозрачно (opacity:0.7) *@
 @if (past.Count > 0)
 {
     <p class="section-heading" style="font-size:0.9rem;">Минали</p>
@@ -193,7 +166,6 @@ else
     </div>
 }
 
-@* ── Задачи ────────────────────────────────────────────────────────────── *@
 <h2 class="section-heading">Задачи</h2>
 
 @if (showTaskForm)
@@ -245,20 +217,16 @@ else
     <button class="btn btn-primary mb-3" @onclick="() => showTaskForm = true">&#43; Добави задача</button>
 }
 
-@* Филтър бутони — taskFilter е string с избрания филтър *@
 <div class="mb-3 d-flex gap-2 flex-wrap">
-    @* Итерираме по inline масив от strings — new[] { ... } *@
+    
     @foreach (var s in new[] { "Всички", "За изпълнение", "В процес", "Завършена" })
     {
-        @* Тернарен оператор в class: активният филтър получава "btn-primary",
-           останалите "btn-outline-primary" *@
+        
         <button class="btn btn-sm @(taskFilter == s ? "btn-primary" : "btn-outline-primary")"
                 @onclick="() => taskFilter = s">@s</button>
     }
 </div>
 
-@* Изчисляваме филтрирания списък в C# блок преди HTML рендирането.
-   LINQ .Where() работи само в паметта — не прави нова заявка към базата! *@
 @{
     var filtered = taskFilter == "Всички" ? taskList : taskList.Where(t => t.Status == taskFilter).ToList();
 }
@@ -280,11 +248,7 @@ else
                         <td>@t.CreatedBy</td>
                         <td>@t.Assignee</td>
                         <td>
-                            @* Inline промяна на статус — без отделна форма!
-                               value="@t.Status" показва текущия статус.
-                               @onchange (не @bind!) защото трябва да извикаме
-                               метод UpdateTaskStatus с параметри.
-                               e.Value е обект (object?), затова ползваме ?. и ToString(). *@
+                            
                             <select class="form-select form-select-sm" style="width:auto;"
                                     value="@t.Status"
                                     @onchange="e => UpdateTaskStatus(t, e.Value?.ToString() ?? t.Status)">
@@ -306,47 +270,39 @@ else
 </div>
 
 @code {
-    // Три колекции за трите вида данни в тази страница.
+
     List<CouncilEvent>   eventList    = new();
-    List<EventAttendee>  allAttendees = new();  // всички участници от базата
+    List<EventAttendee>  allAttendees = new();
     List<ProjectTask>    taskList     = new();
     List<Member>         membersList  = new();
 
-    // Dictionary<int, string>: ключ = EventId, стойност = въведено от потребителя.
-    // Всяко събитие има свое отделно поле за въвеждане на участник.
     Dictionary<int, string> newAttendeeName = new();
 
-    // ── State за формата за събитие ────────────────────────────────────
     bool showEventForm;
     int editingEventId;
     string evName = "", evLocation = "", evDescription = "", evOrganizer = "";
-    // AddDays(7) — по подразбиране събитието е след 7 дни (разумна начална стойност)
+
     DateTime evDate = DateTime.Today.AddDays(7);
     int evMax = 30;
 
-    // ── State за формата за задача ─────────────────────────────────────
     bool showTaskForm;
     string taskName = "", taskAssignee = "", taskCreatedBy = "", taskStatus = "За изпълнение";
-    // taskFilter определя кой от бутоните за филтриране е активен.
+
     string taskFilter = "Всички";
 
-    // OnInitialized() — зарежда всички нужни данни при първо показване.
     protected override void OnInitialized()
     {
         LoadData();
     }
 
-    // LoadData(): централен метод за презареждане на всички данни.
-    // Вика се при стартиране и след всяка промяна на базата.
     void LoadData()
     {
         membersList  = Db.Members.ToList();
         eventList    = Db.CouncilEvents.ToList();
-        // Зареждаме ВСИЧКИ участници наведнъж — по-ефективно от N отделни заявки.
-        // Филтрирането по EventId ставa по-късно с LINQ .Where() в паметта.
+
         allAttendees = Db.EventAttendees.ToList();
         taskList     = Db.ProjectTasks.ToList();
-        // Инициализираме речника само за нови събития (ContainsKey предпазва от презаписване).
+
         foreach (var ev in eventList)
             if (!newAttendeeName.ContainsKey(ev.Id)) newAttendeeName[ev.Id] = "";
     }
@@ -365,11 +321,11 @@ else
         if (string.IsNullOrWhiteSpace(evName)) return;
         if (editingEventId != 0)
         {
-            // Find(id): EF Core ще провери кеша, после базата.
+
             var e = Db.CouncilEvents.Find(editingEventId);
             if (e != null)
             {
-                // EF Core change tracking: промяната = UPDATE при SaveChanges().
+
                 e.Name = evName; e.Location = evLocation;
                 e.Description = evDescription; e.Date = evDate; e.MaxParticipants = evMax;
                 e.Organizer = evOrganizer;
@@ -384,7 +340,7 @@ else
                 Organizer = evOrganizer
             });
         }
-        // Записваме INSERT или UPDATE в базата.
+
         Db.SaveChanges();
         LoadData();
         CancelEventForm();
@@ -400,31 +356,30 @@ else
 
     void DeleteEvent(CouncilEvent ev)
     {
-        // Трябва да изтрием участниците ПРЕДИ събитието!
-        // Foreign Key constraint — не може да изтрие родител с деца.
+
         var ats = Db.EventAttendees.Where(a => a.EventId == ev.Id).ToList();
-        // RemoveRange: по-ефективно от Remove() в цикъл за множество обекти.
+
         Db.EventAttendees.RemoveRange(ats);
         Db.CouncilEvents.Remove(ev);
-        // Всичко в една транзакция: или всичко се записва, или нищо.
+
         Db.SaveChanges();
         LoadData();
     }
 
     void AddAttendee(int eventId)
     {
-        // TryGetValue: безопасно четене от Dictionary без изключение.
+
         if (!newAttendeeName.TryGetValue(eventId, out var name) || string.IsNullOrWhiteSpace(name)) return;
-        // Намираме събитието за да проверим капацитета.
+
         var ev = Db.CouncilEvents.Find(eventId);
         if (ev == null) return;
-        // Проверяваме броя реални участници директно от базата.
+
         var count = Db.EventAttendees.Count(a => a.EventId == eventId);
         if (count >= ev.MaxParticipants) return;
-        // Добавяме нов участник с EventId като Foreign Key.
+
         Db.EventAttendees.Add(new EventAttendee { EventId = eventId, Name = name });
         Db.SaveChanges();
-        // Нулираме само полето за това събитие.
+
         newAttendeeName[eventId] = "";
         LoadData();
     }
@@ -442,19 +397,19 @@ else
         Db.ProjectTasks.Add(new ProjectTask { Name = taskName, Assignee = taskAssignee, CreatedBy = taskCreatedBy, Status = taskStatus });
         Db.SaveChanges();
         taskList = Db.ProjectTasks.ToList();
-        // Нулираме само текстовите полета, статусът остава за следващото добавяне.
+
         taskName = taskAssignee = taskCreatedBy = ""; showTaskForm = false;
     }
 
     void UpdateTaskStatus(ProjectTask t, string newStatus)
     {
-        // Взимаме прясната инстанция от базата (не работим с cached обекта от foreach).
+
         var task = Db.ProjectTasks.Find(t.Id);
         if (task == null) return;
         task.Status = newStatus;
-        // SaveChanges: UPDATE ProjectTasks SET Status = @newStatus WHERE Id = @id
+
         Db.SaveChanges();
-        // Презареждаме за да отразим промяната.
+
         taskList = Db.ProjectTasks.ToList();
     }
 
