@@ -215,5 +215,5 @@
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/ref/StudentCouncil.dll
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/StudentCouncil.sourcelink.json
 /Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/8wvbawf7c1-{0}-hu9d4yj9lm-hu9d4yj9lm.gz
-/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/w5yrsc10bb-{0}-shvm0q9hcx-shvm0q9hcx.gz
-/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/efzv32a5w0-{0}-shvm0q9hcx-shvm0q9hcx.gz
+/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/w5yrsc10bb-{0}-7h6y7qm2z8-7h6y7qm2z8.gz
+/Users/polinadusheva/Documents/GitHub/Student-council-/obj/Debug/net10.0/compressed/efzv32a5w0-{0}-7h6y7qm2z8-7h6y7qm2z8.gz

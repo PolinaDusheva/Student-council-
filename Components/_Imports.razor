@@ -1,67 +1,21 @@
-@* ============================================================
-   ФАЙЛ: Components/_Imports.razor
-   ЦЕЛЬ: Глобални using директиви за всички .razor файлове
-         в тази папка и всички подпапки.
-
-   КАК РАБОТИ:
-   В обикновен C# файл всеки файл трябва поотделно да декларира
-   кои namespace-ове ползва (using ...). В Blazor файл _Imports.razor
-   е специален — всичко в него автоматично се включва във ВСЕКИ
-   .razor файл в тази директория. Спестява повтарящи се редове.
-
-   Blazor компилаторът обработва _Imports.razor преди останалите
-   компоненти и инжектира тези директиви в тях.
-   ============================================================ *@
-
-@* System.Net.Http — за HTTP клиент (fetch заявки към API-та).
-   Не го ползваме директно в момента, но е стандарт за Blazor проекти. *@
+﻿
 @using System.Net.Http
-
-@* System.Net.Http.Json — разширителни методи за JSON сериализация
-   върху HttpClient. Позволява GetFromJsonAsync<T>(), PostAsJsonAsync() и др. *@
 @using System.Net.Http.Json
-
-@* Microsoft.AspNetCore.Components.Forms — компоненти за форми: EditForm,
-   ValidationMessage, DataAnnotationsValidator. *@
 @using Microsoft.AspNetCore.Components.Forms
-
-@* Microsoft.AspNetCore.Components.Routing — компоненти за навигация:
-   NavLink (умен линк, знае кога е "активен"), NavigationManager. *@
 @using Microsoft.AspNetCore.Components.Routing
-
-@* Microsoft.AspNetCore.Components.Web — HTML event типове (MouseEventArgs,
-   ChangeEventArgs...) и RenderMode дефиниции. *@
 @using Microsoft.AspNetCore.Components.Web
-
-@* Импортираме статично RenderMode класа за удобен синтаксис:
-   @rendermode InteractiveServer вместо @rendermode RenderMode.InteractiveServer *@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
-
-@* Virtualization — за виртуализация на дълги списъци. <Virtualize> компонентът
-   рендира само видимите елементи, което ускорява UI с хиляди записи. *@
 @using Microsoft.AspNetCore.Components.Web.Virtualization
-
-@* JSInterop — позволява извикване на JavaScript функции от C# и обратно.
-   Нужно е когато Blazor не може да направи нещо директно (напр. clipboard). *@
 @using Microsoft.JSInterop
 
-@* EntityFrameworkCore — EF Core разширителни методи: Include(), Where(),
-   FirstOrDefault() и т.н. Нужен е в .razor файловете когато ползваме EF LINQ. *@
 @using Microsoft.EntityFrameworkCore
 
-@* Нашите собствени namespace-ове от проекта: *@
-
-@* Коренов namespace на проекта *@
 @using StudentCouncil
 
-@* Компоненти (страниците, layout компонентите) *@
 @using StudentCouncil.Components
 
-@* Layout компоненти — MainLayout, NavMenu и т.н. *@
 @using StudentCouncil.Components.Layout
 
-@* Data слой — AppDbContext (нашата база данни) *@
 @using StudentCouncil.Data
 
-@* Models — всички модели: Member, CouncilEvent, ProjectTask и т.н. *@
 @using StudentCouncil.Models
